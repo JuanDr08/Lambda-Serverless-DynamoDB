@@ -9,11 +9,62 @@ provider: # Es en donde sera subida nuestra funcion
   name: aws # En este caso sera a AWS
   runtime: nodejs20.x # El interprete sera nodejs 20
   region: us-east-2
+  iamRoleStatements: # En esta seccion lo que haremos es decirle a nuestro proyecto que tiene permisos de poder escribir 
+    # dentro de la tabla que creamos de dynamoDB, asignandole la llave arn que da acceso a dicha tabla
+    - Effect: "Allow"
+      Action:
+        - dynamodb:* # escribir, leer, eliminar, actualizar
+      Resource:
+        - arn:aws:dynamodb:us-east-2:686255964377:table/TaskTable # ARN de la tabla de dynamoDB
 
 functions: # Seccion funciones es como si fuera un enrutador, donde asignamos todas las propiedades y rutas de nuestra API
   hello: # Agrupador de nuestra funcion
-    handler: handler.hello # Ruta de donde se encuentra la funcion
+    handler: src/handler.hello # Ruta de donde se encuentra la funcion
     events:
       - httpApi: # Configurar la ruta http (metodos y ruta)
           path: / # Ruta
-          method: get # MEtodo
+          method: get # Metodo
+  createTask:
+    handler: src/addTask.addTask
+    events:
+      - httpApi:
+          path: /tasks
+          method: post
+  getAllTasks:
+    handler: src/getAllTasks.getAllTasks
+    events:
+      - httpApi:
+          path: /tasks
+          method: get
+  getTask:
+    handler: src/getTask.getTask
+    events:
+      - httpApi:
+          path: /tasks/{id} # De esta forma definimos que la ruta usara parametros y accederemos a ellos con el nombre de 'id'
+          method: get
+  updateTask:
+    handler: src/updateTask.updateTask
+    events:
+      - httpApi:
+          path: /tasks/{id}
+          method: put
+  deleteTask:
+    handler: src/deleteTask.deleteTask
+    events:
+      - httpApi:
+          path: /tasks/{id}
+          method: delete
+
+resources: # Seccion de recursos
+  Resources:
+    TaskTable: # Nombre del recurso
+      Type: AWS::DynamoDB::Table # Tipo del recurso, en este caso una tabla de DynamoDB de AWS
+      Properties: # Propiedades del recurso
+        TableName: TaskTable # Nombre de la tabla
+        BillingMode: PAY_PER_REQUEST # Modo de facturacion
+        AttributeDefinitions: # Definicion de atributos como campos por ejemplo
+          - AttributeName: id # Atributo llamado id
+            AttributeType: S # Tipo de dato del atributo, en este caso string
+        KeySchema: # En este caso estamos definiendo un primary key y se lo asignamos al campo 'id'
+          - AttributeName: id
+            KeyType: HASH
