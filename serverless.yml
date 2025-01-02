@@ -16,14 +16,23 @@ provider: # Es en donde sera subida nuestra funcion
         - dynamodb:* # escribir, leer, eliminar, actualizar
       Resource:
         - arn:aws:dynamodb:us-east-2:686255964377:table/TaskTable # ARN de la tabla de dynamoDB
+  # environment: # En esta seccion definimos las variables de entorno que estaran disponibles en nuestras funciones
+    # SOME_ENV_VAR: someValue # Se accede de la manera tradicional, process.env.SOME_ENV_VAR
 
+# Todas las funciones que pongamos dentro de esta seccion seran funciones lambda si usamos AWS
 functions: # Seccion funciones es como si fuera un enrutador, donde asignamos todas las propiedades y rutas de nuestra API
   hello: # Agrupador de nuestra funcion
     handler: src/handler.hello # Ruta de donde se encuentra la funcion
-    events:
+    events: # Los eventos son los elementos que activan la ejecución de las funciones, como desencadenadores.
+    # Algunos tipos de eventos son:
+    # API gateway
+    # s3
+    # SNS, SQS
+    # EventBridge (Scheduled trggers, CodeCommit, CodeBuild, CodePipeline)
       - httpApi: # Configurar la ruta http (metodos y ruta)
           path: / # Ruta
           method: get # Metodo
+          # cors: true Por si queremos habilitar CORS
   createTask:
     handler: src/addTask.addTask
     events:
@@ -68,3 +77,7 @@ resources: # Seccion de recursos
         KeySchema: # En este caso estamos definiendo un primary key y se lo asignamos al campo 'id'
           - AttributeName: id
             KeyType: HASH
+
+# Plugins
+plugins: # Aca podemos definir los plugins que usaremos
+  - serverless-offline

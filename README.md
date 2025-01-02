@@ -19,3 +19,15 @@ Es importante resaltar que serverless usa la linea de comandos de AWS, es decir,
 
 Investigar el paquete de middy para crear middlewares en nuestras funciones
 Link: [Middy](https://middy.js.org/)
+
+- El siguiente comando nos permite ejecutar o 'testear' una funcion localmente
+
+    ` sls invoke local --function <functionName>`
+
+- Si le queremos pasar parametros deberemos agregar el parametro --data '{"name":"Juan"}' al final del comando
+
+    `sls invoke local --function <functionName> --data '{"name":"Juan"}'`
+
+- Serverless tambien nos ofrece plugins, que son piezas de javascript que nos permiten extender las funciones de serverless, como por ejemplo el plugin serverless-offline, que nos permite ejecutar nuestras funciones lambda y API Getway localmente sin tener que subirlas a la nube. El comando para instalar un plugin es: 
+
+    `sls plugin install --name serverless-offline (o el nombre del plugin que queremos instalar)`
